@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
+from ai import analyze_complaint
 
 app = Flask(__name__)
 
@@ -25,12 +26,18 @@ def analyze():
     print("Location:", location)
     print("Category:", category)
 
+    ai_result = analyze_complaint(description, location)
+
     return jsonify({
-        "message": "Complaint received successfully!",
-        "description": description,
-        "location": location,
-        "category": category
-    })
+    "message": "Complaint analyzed successfully!",
+    "description": description,
+    "location": location,
+    "category": ai_result["category"],
+    "priority": ai_result["priority"],
+    "summary": ai_result["summary"],
+    "authority": ai_result["authority"]
+})
+    
 
 
 if __name__ == "__main__":

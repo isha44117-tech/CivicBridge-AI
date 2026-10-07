@@ -26,7 +26,8 @@ analyzeButton.addEventListener("click", async function () {
     document.querySelector("#result").style.display = "block";
 
 document.querySelector("#resultCategory").textContent = result.category;
-document.querySelector("#resultPriority").textContent = "Pending AI";
-document.querySelector("#resultSummary").textContent = result.description;
-document.querySelector("#resultAuthority").textContent = "Pending AI";
+document.querySelector("#resultPriority").textContent = result.priority;
+document.querySelector("#resultSummary").textContent = result.summary;
+document.querySelector("#resultAuthority").textContent = result.authority;
+
 });
