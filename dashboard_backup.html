@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Dashboard | CivicBridge AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #f4f7fb;
+            color: #1e293b;
+        }
+
+        header {
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            color: #1d4ed8;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #00000010;
+        }
+
+        .number {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .table-container {
+            background: white;
+            margin-top: 28px;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #eff6ff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CivicBridge AI</h1>
+        <p>Civic Intelligence Dashboard</p>
+    </header>
+
+    <section class="stats">
+        <div class="card">
+            Total Complaints
+            <div class="number" id="total">0</div>
+        </div>
+
+        <div class="card">
+            High Priority
+            <div class="number" id="high">0</div>
+        </div>
+        <div class="card">
+    Medium Priority
+    <div class="number" id="medium">0</div>
+</div>
+
+<div class="card">
+    Low Priority
+    <div class="number" id="low">0</div>
+</div>
+
+        <div class="card">
+            Waste Management
+            <div class="number" id="waste">0</div>
+        </div>
+    </section>
+    <section class="table-container">
+    <h2>Civic Insights</h2>
+    <p>Repeated issues identified from citizen reports.</p>
+
+    <div id="recurringInsights">
+        <p>Loading civic insights...</p>
+    </div>
+</section>
+
+    <section class="table-container">
+        <h2>Reported Complaints</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Issue</th>
+                    <th>Location</th>
+                    <th>Priority</th>
+                    <th>Authority</th>
+                </tr>
+            </thead>
+            <tbody id="complaints">
+                <tr>
+                    <td colspan="5">Dashboard data will appear here.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+<script>
+async function loadDashboard() {
+    try {
+        const response = await fetch("/dashboard-data");
+        const data = await response.json();
+
+        document.getElementById("total").textContent = data.total;
+        document.getElementById("high").textContent = data.high;
+        document.getElementById("medium").textContent = data.medium;
+        document.getElementById("low").textContent = data.low;
+        document.getElementById("waste").textContent = data.waste;
+
+        const tbody = document.getElementById("complaints");
+        tbody.innerHTML = "";
+
+        data.complaints.forEach(complaint => {
+            const row = document.createElement("tr");
+
+            [
+                complaint.id,
+                complaint.category,
+                complaint.location,
+                complaint.priority,
+                complaint.authority
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value ?? "Not available";
+                row.appendChild(cell);
+            });
+
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Dashboard loading failed:", error);
+    }
+}
+
+loadDashboard();
+async function loadRecurringInsights() {
+    const container = document.getElementById("recurringInsights");
+
+    try {
+        const response = await fetch("/recurring-complaints");
+
+        if (!response.ok) {
+            throw new Error("Could not load recurring complaints");
+        }
+
+        const data = await response.json();
+
+        if (data.recurring_complaints.length === 0) {
+            container.textContent = "No recurring issues detected yet.";
+            return;
+        }
+
+        container.innerHTML = "";
+
+        data.recurring_complaints.forEach(issue => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.style.marginTop = "12px";
+
+            const title = document.createElement("h3");
+            title.textContent = issue.category;
+
+            const location = document.createElement("p");
+            location.textContent = "Location: " + issue.location;
+
+            const count = document.createElement("p");
+            count.textContent = "Reports received: " + issue.complaint_count;
+
+            card.append(title, location, count);
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error("Recurring insights error:", error);
+        container.textContent = "Civic insights are temporarily unavailable.";
+    }
+}
+
+loadRecurringInsights();
+</script>
+</body>
+</html>
