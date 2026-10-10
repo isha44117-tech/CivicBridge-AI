@@ -131,6 +131,19 @@
         .stats {
             grid-template-columns: 1fr;
         }
+        .stats .card {
+    min-width: 0;
+    min-height: 90px;
+    overflow: visible;
+}
+
+.stats .number {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    font-size: 28px;
+    line-height: 1.4;
+}
     }
     .priority-badge {
     display: inline-block;
@@ -154,6 +167,40 @@
 .priority-low {
     color: #166534;
     background: #dcfce7;
+}
+/* Mobile-friendly complaints table */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+@media (max-width: 600px) {
+    .table-container {
+        border-radius: 12px;
+    }
+
+    table {
+        min-width: 620px;
+    }
+
+    th,
+    td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
 }
     </style>
 </head>
@@ -245,8 +292,21 @@ async function loadDashboard() {
                 complaint.authority
             ].forEach(value => {
                 const cell = document.createElement("td");
-                cell.textContent = value ?? "Not available";
-                row.appendChild(cell);
+
+if (value === complaint.priority) {
+    const badge = document.createElement("span");
+    badge.classList.add("priority-badge");
+
+    const priority = String(value ?? "").toLowerCase();
+    badge.classList.add(`priority-${priority}`);
+    badge.textContent = value ?? "Not available";
+
+    cell.appendChild(badge);
+} else {
+    cell.textContent = value ?? "Not available";
+}
+
+row.appendChild(cell);
             });
 
             tbody.appendChild(row);
