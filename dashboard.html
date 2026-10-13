@@ -4,270 +4,295 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Civic Dashboard | CivicBridge AI</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
-        
-    :root {
-        --navy: #10243a;
-        --blue: #1d4ed8;
-        --teal: #0f9d91;
-        --bg: #f3f6fb;
-        --text: #1e293b;
-        --muted: #64748b;
-        --border: #e2e8f0;
-        --white: #ffffff;
-    }
+        :root {
+            --navy: #10243a;
+            --blue: #1d4ed8;
+            --bg: #f3f6fb;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+        }
 
-    * {
-        box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    body {
-        margin: 0;
-        padding: 32px;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-    }
+        html {
+            min-height: 100%;
+            overflow-y: auto;
+        }
 
-    header {
-        background: linear-gradient(120deg, var(--navy), #1d4ed8);
-        color: white;
-        padding: 30px;
-        border-radius: 18px;
-        margin-bottom: 28px;
-        box-shadow: 0 8px 24px #10243a18;
-    }
-
-    h1 {
-        margin: 0 0 8px;
-        font-size: 30px;
-        letter-spacing: -0.5px;
-    }
-
-    header p {
-        margin: 0;
-        color: #dbeafe;
-    }
-
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
-    }
-
-    .card {
-        background: var(--white);
-        padding: 24px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: 0 4px 14px #10243a08;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 24px #10243a12;
-    }
-
-    .number {
-        font-size: 34px;
-        font-weight: 700;
-        color: var(--navy);
-        margin-top: 14px;
-    }
-
-    .table-container {
-        background: var(--white);
-        margin-top: 28px;
-        padding: 24px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: 0 4px 14px #10243a08;
-        overflow-x: auto;
-    }
-
-    h2 {
-        color: var(--navy);
-        margin-top: 0;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 600px;
-    }
-
-    th, td {
-        padding: 15px 14px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-    }
-
-    th {
-        background: #edf3fb;
-        color: var(--navy);
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    tbody tr:hover {
-        background: #f0fdfa;
-    }
-
-    @media (max-width: 700px) {
         body {
-            padding: 16px;
+            margin: 0;
+            padding: clamp(16px, 3vw, 32px);
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
         }
 
         header {
-            padding: 22px;
+            background: linear-gradient(120deg, var(--navy), var(--blue));
+            color: white;
+            padding: 30px;
+            border-radius: 18px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 24px #10243a18;
         }
 
         h1 {
-            font-size: 25px;
+            margin: 0 0 8px;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            margin: 0;
+            color: #dbeafe;
+        }
+
+        h2 {
+            color: var(--navy);
+            margin-top: 0;
         }
 
         .stats {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
         }
-        .stats .card {
-    min-width: 0;
-    min-height: 90px;
-    overflow: visible;
-}
 
-.stats .number {
-    display: block;
-    visibility: visible;
-    opacity: 1;
-    font-size: 28px;
-    line-height: 1.4;
-}
-    }
-    .priority-badge {
-    display: inline-block;
-    padding: 6px 11px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.priority-high {
-    color: #b91c1c;
-    background: #fee2e2;
-}
-
-.priority-medium {
-    color: #92400e;
-    background: #fef3c7;
-}
-
-.priority-low {
-    color: #166534;
-    background: #dcfce7;
-}
-/* Mobile-friendly complaints table */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th,
-td {
-    padding: 12px 10px;
-    text-align: left;
-    vertical-align: top;
-}
-
-@media (max-width: 600px) {
-    .table-container {
-        border-radius: 12px;
-    }
-
-    table {
-        min-width: 620px;
-    }
-
-    th,
-    td {
-        padding: 10px 8px;
-        font-size: 12px;
-    }
-}
-.charts-section {
-    margin: 28px 0;
-}
-
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-}
-
-.chart-card {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-    min-width: 0;
-    min-height: 320px;
-}
-
-.chart-card h3 {
-    margin-top: 0;
-    margin-bottom: 18px;
-    color: #0f172a;
-    font-size: 16px;
-}
-
-.chart-card canvas {
-    width: 100% !important;
-    max-height: 240px;
-}
-    /* Responsive layout and normal page scrolling */
-    html {
-        min-height: 100%;
-        overflow-y: auto;
-    }
-
-    body {
-        min-height: 100vh;
-        width: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-        padding: clamp(16px, 3vw, 32px);
-    }
-
-    .stats,
-    .stats > .card,
-    .table-container,
-    .charts-grid,
-    .chart-card {
-        min-width: 0;
-    }
-
-    @media (max-width: 1100px) {
-        .stats {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .card {
+            min-width: 0;
+            background: var(--white);
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 14px #10243a08;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-    }
 
-    @media (max-width: 600px) {
-        .stats {
-            grid-template-columns: minmax(0, 1fr);
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px #10243a12;
         }
-    }
+
+        .number {
+            display: block;
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-top: 14px;
+            line-height: 1.4;
+        }
+
+        .table-container {
+            width: 100%;
+            min-width: 0;
+            background: var(--white);
+            margin-top: 28px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 14px #10243a08;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 620px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #edf3fb;
+            color: var(--navy);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover {
+            background: #f0fdfa;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .priority-high {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .priority-medium {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .priority-low {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .charts-section {
+            margin: 28px 0;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            min-width: 0;
+            min-height: 320px;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .chart-card h3 {
+            margin-top: 0;
+            margin-bottom: 18px;
+            color: #0f172a;
+            font-size: 16px;
+        }
+
+        .chart-card canvas {
+            width: 100% !important;
+            max-height: 240px;
+        }
+
+        .map-section {
+            margin: 28px 0;
+            padding: 22px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .map-section p {
+            color: var(--muted);
+            margin-bottom: 18px;
+        }
+
+        #civicMap {
+            width: 100%;
+            height: 420px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #e2e8f0;
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+            font-size: 13px;
+        }
+
+        .map-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+        }
+
+        .high-dot {
+            background: #ef4444;
+        }
+
+        .medium-dot {
+            background: #f59e0b;
+        }
+
+        .low-dot {
+            background: #22c55e;
+        }
+
+        @media (max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px;
+            }
+
+            header {
+                padding: 22px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .stats {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .number {
+                font-size: 28px;
+            }
+
+            .table-container {
+                padding: 16px;
+            }
+
+            .map-section {
+                padding: 14px;
+            }
+
+            #civicMap {
+                height: 320px;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 12px;
+            }
+        }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
     <header>
@@ -285,48 +310,64 @@ td {
             High Priority
             <div class="number" id="high">0</div>
         </div>
-        <div class="card">
-    Medium Priority
-    <div class="number" id="medium">0</div>
-</div>
 
-<div class="card">
-    Low Priority
-    <div class="number" id="low">0</div>
-</div>
+        <div class="card">
+            Medium Priority
+            <div class="number" id="medium">0</div>
+        </div>
+
+        <div class="card">
+            Low Priority
+            <div class="number" id="low">0</div>
+        </div>
 
         <div class="card">
             Waste Management
             <div class="number" id="waste">0</div>
         </div>
     </section>
-    <section class="table-container">
-    <h2>Civic Insights</h2>
-    <p>Repeated issues identified from citizen reports.</p>
-
-    <div id="recurringInsights">
-        <p>Loading civic insights...</p>
-    </div>
-</section>
 
     <section class="table-container">
-        <section class="charts-section">
-    <h2>Civic Analytics</h2>
+        <h2>Civic Insights</h2>
+        <p>Repeated issues identified from citizen reports.</p>
 
-    <div class="charts-grid">
-        <div class="chart-card">
-            <h3>Complaints by Priority</h3>
-            <canvas id="priorityChart"></canvas>
+        <div id="recurringInsights">
+            <p>Loading civic insights...</p>
         </div>
+    </section>
 
-        <div class="chart-card">
-            <h3>Complaints by Category</h3>
-            <canvas id="categoryChart"></canvas>
+    <section class="charts-section">
+        <h2>Civic Analytics</h2>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Complaints by Priority</h3>
+                <canvas id="priorityChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3>Complaints by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
         </div>
-    </div>
-</section>
-        
+    </section>
+
+    <section class="map-section">
+        <h2>Civic Hotspot Map</h2>
+        <p>Explore complaint locations and identify recurring civic issues.</p>
+
+        <div id="civicMap"></div>
+
+        <div class="map-legend">
+            <span><i class="legend-dot high-dot"></i> High Priority</span>
+            <span><i class="legend-dot medium-dot"></i> Medium Priority</span>
+            <span><i class="legend-dot low-dot"></i> Low Priority</span>
+        </div>
+    </section>
+
+    <section class="table-container">
         <h2>Reported Complaints</h2>
+
         <table>
             <thead>
                 <tr>
@@ -337,165 +378,274 @@ td {
                     <th>Authority</th>
                 </tr>
             </thead>
+
             <tbody id="complaints">
                 <tr>
-                    <td colspan="5">Dashboard data will appear here.</td>
+                    <td colspan="5">Loading complaints...</td>
                 </tr>
             </tbody>
         </table>
     </section>
 
-<script>
-async function loadDashboard() {
-    try {
-        const response = await fetch("/dashboard-data");
-        const data = await response.json();
-        console.log("Dashboard API response:", data);
+    <script>
+        let priorityChartInstance = null;
+        let categoryChartInstance = null;
+        let civicMap = null;
+        let complaintMarkers = [];
 
-        document.getElementById("total").textContent = data.total;
-        document.getElementById("high").textContent = data.high;
-        document.getElementById("medium").textContent = data.medium;
-        document.getElementById("low").textContent = data.low;
-        document.getElementById("waste").textContent = data.waste;
-        // Priority distribution chart
-        new Chart(document.getElementById("priorityChart"), {
-            type: "doughnut",
-            data: {
-                labels: ["High", "Medium", "Low"],
-                datasets: [{
-                    data: [data.high, data.medium, data.low],
-                    backgroundColor: ["#ef4444", "#f59e0b", "#22c55e"],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: "bottom"
-                    }
+        async function loadDashboard() {
+            try {
+                const response = await fetch("/dashboard-data");
+
+                if (!response.ok) {
+                    throw new Error("Dashboard API request failed");
                 }
-            }
-        });
 
-        // Category-wise complaints chart
-        const categoryCounts = {};
+                const data = await response.json();
+                console.log("Dashboard API response:", data);
 
-        data.complaints.forEach(complaint => {
-            const category = complaint.category || "Unknown";
-            categoryCounts[category] = (categoryCounts[category] || 0) + 1;
-        });
+                document.getElementById("total").textContent = data.total ?? 0;
+                document.getElementById("high").textContent = data.high ?? 0;
+                document.getElementById("medium").textContent = data.medium ?? 0;
+                document.getElementById("low").textContent = data.low ?? 0;
+                document.getElementById("waste").textContent = data.waste ?? 0;
 
-        new Chart(document.getElementById("categoryChart"), {
-            type: "bar",
-            data: {
-                labels: Object.keys(categoryCounts),
-                datasets: [{
-                    label: "Complaints",
-                    data: Object.values(categoryCounts),
-                    backgroundColor: "#0f766e",
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
+                if (priorityChartInstance) {
+                    priorityChartInstance.destroy();
+                }
+
+                priorityChartInstance = new Chart(
+                    document.getElementById("priorityChart"),
+                    {
+                        type: "doughnut",
+                        data: {
+                            labels: ["High", "Medium", "Low"],
+                            datasets: [{
+                                data: [
+                                    data.high ?? 0,
+                                    data.medium ?? 0,
+                                    data.low ?? 0
+                                ],
+                                backgroundColor: ["#ef4444", "#f59e0b", "#22c55e"],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: "bottom"
+                                }
+                            }
                         }
                     }
+                );
+
+                const categoryCounts = {};
+
+                (data.complaints || []).forEach(complaint => {
+                    const category = complaint.category || "Unknown";
+                    categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+                });
+
+                if (categoryChartInstance) {
+                    categoryChartInstance.destroy();
                 }
+
+                categoryChartInstance = new Chart(
+                    document.getElementById("categoryChart"),
+                    {
+                        type: "bar",
+                        data: {
+                            labels: Object.keys(categoryCounts),
+                            datasets: [{
+                                label: "Complaints",
+                                data: Object.values(categoryCounts),
+                                backgroundColor: "#0f766e",
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
+
+                const tbody = document.getElementById("complaints");
+                tbody.innerHTML = "";
+
+                if (!data.complaints || data.complaints.length === 0) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="5">No complaints reported yet.</td></tr>';
+                } else {
+                    data.complaints.forEach(complaint => {
+                        const row = document.createElement("tr");
+
+                        const values = [
+                            complaint.id,
+                            complaint.category,
+                            complaint.location,
+                            complaint.priority,
+                            complaint.authority
+                        ];
+
+                        values.forEach((value, index) => {
+                            const cell = document.createElement("td");
+
+                            if (index === 3) {
+                                const badge = document.createElement("span");
+                                badge.classList.add("priority-badge");
+
+                                const priority = String(value ?? "").toLowerCase();
+
+                                if (["high", "medium", "low"].includes(priority)) {
+                                    badge.classList.add(`priority-${priority}`);
+                                }
+
+                                badge.textContent = value ?? "Not available";
+                                cell.appendChild(badge);
+                            } else {
+                                cell.textContent = value ?? "Not available";
+                            }
+
+                            row.appendChild(cell);
+                        });
+
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // Update map markers after dashboard data loads.
+                await loadComplaintMarkers(data.complaints || []);
+
+            } catch (error) {
+                console.error("Dashboard loading failed:", error);
             }
-        });
+        }
 
-        const tbody = document.getElementById("complaints");
-        tbody.innerHTML = "";
+        async function loadRecurringInsights() {
+            const container = document.getElementById("recurringInsights");
 
-        data.complaints.forEach(complaint => {
-            const row = document.createElement("tr");
+            try {
+                const response = await fetch("/recurring-complaints");
 
-            [
-                complaint.id,
-                complaint.category,
-                complaint.location,
-                complaint.priority,
-                complaint.authority
-            ].forEach(value => {
-                const cell = document.createElement("td");
+                if (!response.ok) {
+                    throw new Error("Could not load recurring complaints");
+                }
 
-if (value === complaint.priority) {
-    const badge = document.createElement("span");
-    badge.classList.add("priority-badge");
+                const data = await response.json();
+                const issues = data.recurring_complaints || [];
 
-    const priority = String(value ?? "").toLowerCase();
-    badge.classList.add(`priority-${priority}`);
-    badge.textContent = value ?? "Not available";
+                container.innerHTML = "";
 
-    cell.appendChild(badge);
-} else {
-    cell.textContent = value ?? "Not available";
-}
+                if (issues.length === 0) {
+                    container.textContent = "No recurring issues detected yet.";
+                    return;
+                }
 
-row.appendChild(cell);
+                issues.forEach(issue => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.style.marginTop = "12px";
+
+                    const title = document.createElement("h3");
+                    title.textContent = issue.category || "Unknown category";
+
+                    const location = document.createElement("p");
+                    location.textContent = "Location: " + (issue.location || "Not available");
+
+                    const count = document.createElement("p");
+                    count.textContent = "Reports received: " + issue.complaint_count;
+
+                    card.append(title, location, count);
+                    container.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error("Recurring insights error:", error);
+                container.textContent = "Civic insights are temporarily unavailable.";
+            }
+        }
+
+        function initializeCivicMap() {
+            const mapElement = document.getElementById("civicMap");
+
+            if (!mapElement || typeof L === "undefined") {
+                console.error("Map container or Leaflet library is missing.");
+                return;
+            }
+
+            if (civicMap) {
+                civicMap.invalidateSize();
+                return;
+            }
+
+            // General map view only; this is not a complaint's exact location.
+            civicMap = L.map("civicMap").setView([30.7333, 76.7794], 11);
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(civicMap);
+        }
+
+        async function loadComplaintMarkers(complaints) {
+            if (!civicMap) {
+                return;
+            }
+
+            complaintMarkers.forEach(marker => marker.remove());
+            complaintMarkers = [];
+
+            /*
+              Only show a demo hotspot when the sample complaint location
+              matches Sector 17, Chandigarh. The coordinates are approximate
+              sector-level coordinates, not exact addresses.
+            */
+            const sectorComplaints = complaints.filter(complaint => {
+                const location = (complaint.location || "").toLowerCase();
+
+                return location.includes("sector 17") &&
+                       location.includes("chandigarh");
             });
 
-            tbody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Dashboard loading failed:", error);
-    }
-}
+            if (sectorComplaints.length > 0) {
+                const hotspot = L.circleMarker([30.74007, 76.78259], {
+                    radius: 12,
+                    color: "#b91c1c",
+                    fillColor: "#ef4444",
+                    fillOpacity: 0.85,
+                    weight: 3
+                }).addTo(civicMap);
 
-loadDashboard();
-async function loadRecurringInsights() {
-    const container = document.getElementById("recurringInsights");
+                hotspot.bindPopup(`
+                    <strong>Demo Civic Hotspot</strong><br>
+                    Location: Sector 17, Chandigarh<br>
+                    Sample complaints: ${sectorComplaints.length}<br>
+                    Status: Test data — not live reports
+                `);
 
-    try {
-        const response = await fetch("/recurring-complaints");
+                complaintMarkers.push(hotspot);
+            }
 
-        if (!response.ok) {
-            throw new Error("Could not load recurring complaints");
+            console.log("Demo hotspot complaints:", sectorComplaints.length);
         }
 
-        const data = await response.json();
-        document.getElementById("medium").textContent = data.medium;
-        document.getElementById("low").textContent = data.low;
+        initializeCivicMap();
+        loadDashboard();
+        loadRecurringInsights();
+    </script>
 
-        if (data.recurring_complaints.length === 0) {
-            container.textContent = "No recurring issues detected yet.";
-            return;
-        }
-
-        container.innerHTML = "";
-
-        data.recurring_complaints.forEach(issue => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.style.marginTop = "12px";
-
-            const title = document.createElement("h3");
-            title.textContent = issue.category;
-
-            const location = document.createElement("p");
-            location.textContent = "Location: " + issue.location;
-
-            const count = document.createElement("p");
-            count.textContent = "Reports received: " + issue.complaint_count;
-
-            card.append(title, location, count);
-            container.appendChild(card);
-        });
-    } catch (error) {
-        console.error("Recurring insights error:", error);
-        container.textContent = "Civic insights are temporarily unavailable.";
-    }
-}
-
-loadRecurringInsights();
-</script>
 </body>
 </html>
