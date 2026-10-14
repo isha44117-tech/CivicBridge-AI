@@ -601,46 +601,93 @@
         }
 
         async function loadComplaintMarkers(complaints) {
-            if (!civicMap) {
-                return;
-            }
+    if (!civicMap) {
+        return;
+    }
 
-            complaintMarkers.forEach(marker => marker.remove());
-            complaintMarkers = [];
+    complaintMarkers.forEach(marker => marker.remove());
+    complaintMarkers = [];
 
-            /*
-              Only show a demo hotspot when the sample complaint location
-              matches Sector 17, Chandigarh. The coordinates are approximate
-              sector-level coordinates, not exact addresses.
-            */
-            const sectorComplaints = complaints.filter(complaint => {
-                const location = (complaint.location || "").toLowerCase();
-
-                return location.includes("sector 17") &&
-                       location.includes("chandigarh");
-            });
-
-            if (sectorComplaints.length > 0) {
-                const hotspot = L.circleMarker([30.74007, 76.78259], {
-                    radius: 12,
-                    color: "#b91c1c",
-                    fillColor: "#ef4444",
-                    fillOpacity: 0.85,
-                    weight: 3
-                }).addTo(civicMap);
-
-                hotspot.bindPopup(`
-                    <strong>Demo Civic Hotspot</strong><br>
-                    Location: Sector 17, Chandigarh<br>
-                    Sample complaints: ${sectorComplaints.length}<br>
-                    Status: Test data — not live reports
-                `);
-
-                complaintMarkers.push(hotspot);
-            }
-
-            console.log("Demo hotspot complaints:", sectorComplaints.length);
+    const demoLocations = [
+        {
+            name: "Sector 17, Chandigarh",
+            lat: 30.74007,
+            lng: 76.78259
+        },
+        {
+            name: "Sector 22, Chandigarh",
+            lat: 30.7335,
+            lng: 76.7755
+        },
+        {
+            name: "Sector 35, Chandigarh",
+            lat: 30.72550,
+            lng: 76.76038
+        },
+        {
+            name: "Sector 43, Chandigarh",
+            lat: 30.71909,
+            lng: 76.74877
+        },
+        {
+            name: "Industrial Area, Chandigarh",
+            lat: 30.7055,
+            lng: 76.8010
         }
+    ];
+
+    demoLocations.forEach(place => {
+        const matchingComplaints = complaints.filter(complaint => {
+            const location = (complaint.location || "")
+                .toLowerCase()
+                .replace(/\s+/g, " ")
+                .trim();
+
+            const sectorName = place.name.toLowerCase();
+
+if (sectorName.includes("sector 17")) {
+    return location.includes("sector 17") &&
+           location.includes("chandigarh");
+}
+
+return location.includes(sectorName);
+        });
+
+        if (matchingComplaints.length === 0) {
+            return;
+        }
+
+        const marker = L.circleMarker(
+  [place.lat, place.lng],
+  {
+    radius: 10,
+    color: "#1d4ed8",
+    fillColor: "#3b82f6",
+    fillOpacity: 0.85,
+    weight: 3
+  }
+).addTo(civicMap);
+
+console.log("Marker created:", place.name, place.lat, place.lng);
+        const complaintDetails = matchingComplaints
+            .map(complaint =>
+                `${complaint.category || "Uncategorized"} — ${complaint.priority || "Unassigned"}`
+            )
+            .join("<br>");
+
+        marker.bindPopup(`
+            <strong>Demo Civic Location</strong><br>
+            Location: ${place.name}<br>
+            Sample complaints: ${matchingComplaints.length}<br>
+            ${complaintDetails}<br>
+            <em>Test data — not live reports</em>
+        `);
+
+        complaintMarkers.push(marker);
+    });
+
+    console.log("Demo location markers:", complaintMarkers.length);
+}
 
         initializeCivicMap();
         loadDashboard();
