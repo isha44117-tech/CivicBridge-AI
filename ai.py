@@ -6,61 +6,81 @@ model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
 
 
 def analyze_complaint(description, location):
+    text = description.lower().strip()
 
-    def ask_ai(question):
-        inputs = tokenizer(question, return_tensors="pt")
+    # Category detection
+    if any(word in text for word in [
+        "garbage", "waste", "trash", "litter", "rubbish",
+        "dustbin", "sanitation", "dump"
+    ]):
+        category = "Waste Management"
 
-        outputs = model.generate(
-            **inputs,
-            max_new_tokens=40
-        )
+    elif any(word in text for word in [
+        "pothole", "road", "street damage", "broken road",
+        "crack in road", "damaged road"
+    ]):
+        category = "Road"
 
-        return tokenizer.decode(
-            outputs[0],
-            skip_special_tokens=True
-        ).strip()
+    elif any(word in text for word in [
+        "streetlight", "street light", "light pole",
+        "lamp post", "no lights", "lights not working"
+    ]):
+        category = "Streetlight"
 
-    category = ask_ai(
-        f"""Classify this civic complaint into exactly one category:
-Waste Management, Road, Streetlight, Water, Traffic, Other.
+    elif any(word in text for word in [
+        "water leakage", "water leak", "water pipeline",
+        "pipe burst", "water supply", "no water",
+        "water shortage", "drainage", "sewage",
+        "leaking pipe", "water is leaking"
+    ]):
+        category = "Water"
 
-Complaint: {description}
+    elif any(word in text for word in [
+        "traffic", "traffic jam", "signal", "accident",
+        "congestion", "parking"
+    ]):
+        category = "Traffic"
 
-Answer with only the category name."""
-    )
+    else:
+        category = "Other"
 
-    priority = ask_ai(
-        f"""Choose the priority of this civic complaint:
-Low, Medium, or High.
+    # Priority detection
+    if any(word in text for word in [
+        "emergency", "dangerous", "major", "severe",
+        "accident", "burst pipe", "flooding","large pothole","deep pothole","major pothole","road collapsed"
+    ]):
+        priority = "High"
 
-Complaint: {description}
+    elif any(word in text for word in [
+        "not working", "blocked", "leaking",
+        "broken", "overflow", "urgent","pothole","crack in road"
+    ]):
+        priority = "Medium"
 
-Answer with only one word."""
-    )
+    else:
+        priority = "Low"
 
+    # Summary
     summary = f"Reported civic issue: {description.strip()}."
 
+    # Suggested authority
+    if category == "Waste Management":
+        authority = "Municipal Corporation"
 
-    
+    elif category == "Road":
+        authority = "Public Works Department"
 
-    authority = ask_ai(
-    f"""You are a civic department classifier.
+    elif category == "Streetlight":
+        authority = "Electricity Department"
 
-Complaint: {description}
+    elif category == "Water":
+        authority = "Water Supply Department"
 
-Return EXACTLY ONE of these department names:
-Municipal Corporation
-Public Works Department
-Water Supply Department
-Electricity Department
-Traffic Police
-Other
+    elif category == "Traffic":
+        authority = "Traffic Police"
 
-For garbage, waste, litter, or sanitation complaints, return exactly:
-Municipal Corporation
-
-Return ONLY ONE department name."""
-)
+    else:
+        authority = "Other"
 
     return {
         "category": category,

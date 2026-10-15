@@ -620,6 +620,11 @@
             lng: 76.7755
         },
         {
+            name: "Sector 23, Chandigarh",
+            lat: 30.73941,
+            lng: 76.76623
+        },
+        {
             name: "Sector 35, Chandigarh",
             lat: 30.72550,
             lng: 76.76038
@@ -640,18 +645,43 @@
         const matchingComplaints = complaints.filter(complaint => {
             const location = (complaint.location || "")
                 .toLowerCase()
+                .replace(/[.,]/g, " ")
                 .replace(/\s+/g, " ")
                 .trim();
 
-            const sectorName = place.name.toLowerCase();
+            const sectorName = place.name
+                .toLowerCase()
+                .replace(/[.,]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
 
-if (sectorName.includes("sector 17")) {
-    return location.includes("sector 17") &&
-           location.includes("chandigarh");
-}
+            // Match the sector number and city separately.
+            const sectorMatch = sectorName.match(/sector\s+(\d+)/);
 
-return location.includes(sectorName);
+            if (sectorMatch) {
+                const sectorNumber = sectorMatch[1];
+                const complaintSector = new RegExp(
+                    `\\bsector\\s*${sectorNumber}\\b`
+                );
+
+                return complaintSector.test(location) &&
+                       location.includes("chandigarh");
+            }
+
+            // Match Industrial Area variations.
+            if (sectorName.includes("industrial area")) {
+                return location.includes("industrial") &&
+                       location.includes("chandigarh");
+            }
+
+            return location.includes(sectorName);
         });
+
+        console.log(
+            "Location:", place.name,
+            "Matched complaints:", matchingComplaints.length
+        );
+        console.log("Location:", place.name, "Matched complaints:", matchingComplaints.length);
 
         if (matchingComplaints.length === 0) {
             return;
